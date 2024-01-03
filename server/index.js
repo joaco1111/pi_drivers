@@ -1,10 +1,19 @@
-const axios = require("axios");
-const server = require("./src/server");
-const { conn } = require('./src/db.js');
-const PORT = 3001;
+const express = require("express");
+const router = require("./src/routes/index");
+const morgan = require("morgan");
+const cors = require("cors");
 
-conn.sync({ force: true }).then(() => {
+const server = express();
+
+server.use(morgan("dev"));
+server.use(express.json());
+server.use(cors());
+
+server.use(router);
+
+// Escucha en el puerto 5000 o el puerto que desees
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-})
-}).catch(error => console.error(error))
+  console.log(`Server is running on port ${PORT}`);
+});
+

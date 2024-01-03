@@ -1,22 +1,29 @@
-const { DataTypes } = require('sequelize');
+// models/Team.js
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../db');
 
-module.exports = (sequelize) => {
-    sequelize.define('Team', {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            allowNull: false,
-            primaryKey: true
-        },
+class Team extends Model {}
 
-        name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notEmpty: {
-                    msg: 'Name required'
-                }
-            }
-        }
-    }, { timestamps: false }); 
-}
+Team.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: {
+        msg: 'Name required',
+      },
+    },
+  },
+}, {
+  sequelize,
+  modelName: 'Team',
+  timestamps: false,
+});
+
+module.exports = Team;

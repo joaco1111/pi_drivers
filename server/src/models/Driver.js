@@ -1,9 +1,9 @@
 const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
 // Exportamos una funcion que define el modelo
 // Luego le injectamos la conexion a sequelize.
-module.exports = (sequelize) => {
-  // defino el modelo
-  sequelize.define('Driver', {
+
+const Driver = sequelize.define('Driver', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -71,4 +71,5 @@ module.exports = (sequelize) => {
       }
     }
   }, { timestamps: false });
-};
+
+module.exports = Driver;
