@@ -1,19 +1,12 @@
-// const { Router } = require("express");
-// const router = Router();
-// // Configurar los routers
-// // Ejemplo: router.use('/auth', authRouter); 
-// router.use('/', Drivers);
-// router.use('/', Teams);
-// module.exports = router;
-
-
-//-----------api/routes/index.js-----------------
+// routes/index.js
 const express = require('express');
-const router = express.Router();
-const driverRoutes = require('./drivers');
-const teamRoutes = require('./teams');
+const driversController = require('../controllers/driversController');
 
-router.use('/drivers', driverRoutes);
-router.use('/teams', teamRoutes);
+const router = express.Router();
+
+router.get('/drivers', driversController.getAllDrivers);
+router.get('/drivers/:idDriver', driversController.getDriverById);
+router.get('/drivers/name', driversController.searchDrivers);
+router.post('/drivers', driversController.createDriver);
 
 module.exports = router;
