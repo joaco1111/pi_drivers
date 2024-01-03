@@ -1,70 +1,82 @@
-const Driver = require('../models/Driver');
-const Team = require('../models/Team');
+// controllers/driversController.js
+const { Driver } = require('../models/Driver');
 
-
-async function getAllDrivers(req, res) {
+// Obtener todos los conductores
+const getAllDrivers = async (req, res) => {
   try {
-    const drivers = await Driver.findAll({ include: Team });
-    res.json(drivers);
+    const drivers = await Driver.findAll();
+    const driversWithDefaultImage = drivers.map((driver) => ({
+      ...driver.dataValues,
+      image: driver.image || { url: 'URL_POR_DEFECTO' }, // Coloca la URL por defecto que desees
+    }));
+    res.json(driversWithDefaultImage);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener los conductores.' });
+    res.status(500).send('Error interno del servidor');
   }
-}
+};
 
-async function getDriverById(req, res) {
+// Obtener detalles de un conductor por ID
+const getDriverById = async (req, res) => {
   const { idDriver } = req.params;
+
   try {
-    const driver = await Driver.findByPk(idDriver, { include: Team });
+    const driver = await Driver.findByPk(idDriver);
     if (driver) {
-      res.json(driver);
+      const driverWithDefaultImage = {
+        ...driver.dataValues,
+        image: driver.image || { url: 'URL_POR_DEFECTO' }, // Coloca la URL por defecto que desees
+      };
+      res.json(driverWithDefaultImage);
     } else {
-      res.status(404).json({ error: 'Conductor no encontrado.' });
+      res.status(404).send('Conductor no encontrado');
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener el conductor.' });
+    res.status(500).send('Error interno del servidor');
   }
-}
+};
 
-async function searchDrivers(req, res) {
+// Buscar conductores por nombre
+const searchDrivers = async (req, res) => {
   const { name } = req.query;
+
   try {
     const drivers = await Driver.findAll({
-      where: { name: { [Op.iLike]: `%${name}%` } }, // Busca sin importar mayúsculas o minúsculas
-      limit: 15,
-      include: Team,
+      where: {
+        name: {
+          [Op.iLike]: `%${name}%`,
+        },
+      },
     });
-    if (drivers.length > 0) {
-      res.json(drivers);
-    } else {
-      res.status(404).json({ error: 'Ningún conductor encontrado con el nombre proporcionado.' });
-    }
+    const driversWithDefaultImage = drivers.map((driver) => ({
+      ...driver.dataValues,
+      image: driver.image || { url: 'URL_POR_DEFECTO' }, // Coloca la URL por defecto que desees
+    }));
+    res.json(driversWithDefaultImage);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al buscar conductores.' });
+    res.status(500).send('Error interno del servidor');
   }
-}
+};
 
-async function createDriver(req, res) {
-  const { name, teamIds } = req.body;
+// Crear un nuevo conductor
+const createDriver = async (req, res) => {
+  const { name, dob, nationality, teams } = req.body;
+
   try {
-    // Verificar que los equipos existen antes de crear el conductor
-    const teams = await Team.findAll({ where: { id: teamIds } });
-    if (teams.length !== teamIds.length) {
-      return res.status(400).json({ error: 'Uno o más equipos no existen.' });
-    }
-
-    // Crear el conductor y asociarlo a los equipos
-    const newDriver = await Driver.create({ name });
-    await newDriver.setTeams(teamIds);
-
+    const newDriver = await Driver.create({
+      name,
+      dob,
+      nationality,
+      teams,
+    });
     res.status(201).json(newDriver);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al crear el conductor.' });
+    res.status(500).send('Error interno del servidor');
   }
-}
+};
 
 module.exports = {
   getAllDrivers,
